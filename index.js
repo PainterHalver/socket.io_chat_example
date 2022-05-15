@@ -25,11 +25,19 @@ io.on("connection", (socket) => {
   );
   console.log(FgCyan, `Socket ID: ${socket.id}, nickname: ${socket.nickname}`);
 
+  // Send the current online count to the all users
+  io.emit("online count change", io.engine.clientsCount);
+
   // emit to all clients except the sender
   socket.broadcast.emit(
     "chat message",
     `${socket.nickname} joined the chat, total: ${io.engine.clientsCount}`
   );
+
+  // query total online count
+  socket.on("sockets::get", () => {
+    io.to(socket.id).emit("sockets", io.sockets.sockets);
+  });
 
   // When someone is typing
   socket.on("typing", (isTyping) => {
@@ -54,6 +62,7 @@ io.on("connection", (socket) => {
       "chat message",
       `${socket.nickname} left the chat, total: ${io.engine.clientsCount}`
     );
+    io.emit("online count change", io.engine.clientsCount);
   });
 });
 

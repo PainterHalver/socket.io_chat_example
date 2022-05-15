@@ -8,12 +8,22 @@ const socket = io({ query: { nickname } });
 
 const form = document.getElementById("form");
 const input = document.getElementById("input");
+const online = document.getElementById("online-count");
 
 const appendMessage = (msg) => {
   let item = document.createElement("li");
   item.textContent = msg;
   messages.appendChild(item);
-  window.scrollTo(0, document.body.scrollHeight);
+  item.scrollIntoView({ behavior: "smooth" });
+};
+
+const setOnlineUsers = (sockets) => {
+  console.log(sockets);
+  sockets.forEach((socket) => {
+    let item = document.createElement("li");
+    item.textContent = socket.nickname;
+    online.appendChild(item);
+  });
 };
 
 form.addEventListener("submit", (e) => {
@@ -52,6 +62,11 @@ input.addEventListener("keypress", (e) => {
 });
 
 socket.on("chat message", appendMessage);
+socket.on("online count change", (count) => {
+  online.textContent = `Online: ${count}`;
+  // socket.emit("sockets::get");
+  // socket.on("sockets", setOnlineUsers);
+});
 
 socket.on("typing", ({ nickname, isTyping }) => {
   if (isTyping) {
