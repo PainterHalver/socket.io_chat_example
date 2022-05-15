@@ -13,5 +13,5 @@ Here are some ideas to improve the application:
 - [x] Add “{user} is typing” functionality.
 - [x] Show who’s online.
 - [ ] Add color to nickname
-- [ ] Text wrap when msg too long, or limit chars length
+- [x] Text wrap when msg too long, or limit chars length (`word-break: break-word;`)
 - [ ] Add private messaging.

@@ -17,7 +17,8 @@ body {
 }
 
 .online {
-  width: 300px;
+  width: 20%;
+  min-width: 20%;
   justify-self: end;
   text-align: center;
   background-color: rgba(212, 211, 211, 0.623);
@@ -67,7 +68,9 @@ body {
 
 #messages > li {
   padding: 0.5rem 1rem;
+  word-break: break-word;
 }
+
 #messages > li:nth-child(odd) {
   background: #efefef;
 }
