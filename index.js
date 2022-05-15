@@ -7,6 +7,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+const PORT = process.env.PORT || 3000;
+
 const FgRed = "\x1b[31m";
 const FgGreen = "\x1b[32m";
 const FgCyan = "\x1b[36m";
@@ -33,11 +35,6 @@ io.on("connection", (socket) => {
     "chat message",
     `${socket.nickname} joined the chat, total: ${io.engine.clientsCount}`
   );
-
-  // query total online count
-  socket.on("sockets::get", () => {
-    io.to(socket.id).emit("sockets", io.sockets.sockets);
-  });
 
   // When someone is typing
   socket.on("typing", (isTyping) => {
@@ -66,6 +63,17 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("listening on *:3000");
+app.get("/api/users", async (req, res) => {
+  const sockets = await io.fetchSockets();
+  const users = sockets.map((socket) => {
+    return {
+      nickname: socket.nickname,
+      socketId: socket.id,
+    };
+  });
+  res.status(200).json(users);
+});
+
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}...`);
 });

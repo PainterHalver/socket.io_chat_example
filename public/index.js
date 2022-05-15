@@ -9,6 +9,7 @@ const socket = io({ query: { nickname } });
 const form = document.getElementById("form");
 const input = document.getElementById("input");
 const online = document.getElementById("online-count");
+const onlineUl = document.getElementById("online-users");
 
 const appendMessage = (msg) => {
   let item = document.createElement("li");
@@ -17,12 +18,12 @@ const appendMessage = (msg) => {
   item.scrollIntoView({ behavior: "smooth" });
 };
 
-const setOnlineUsers = (sockets) => {
-  console.log(sockets);
-  sockets.forEach((socket) => {
+const setOnlineUsers = (users) => {
+  onlineUl.innerHTML = "";
+  users.forEach((user) => {
     let item = document.createElement("li");
-    item.textContent = socket.nickname;
-    online.appendChild(item);
+    item.textContent = user.nickname;
+    onlineUl.appendChild(item);
   });
 };
 
@@ -62,10 +63,11 @@ input.addEventListener("keypress", (e) => {
 });
 
 socket.on("chat message", appendMessage);
-socket.on("online count change", (count) => {
+socket.on("online count change", async (count) => {
   online.textContent = `Online: ${count}`;
-  // socket.emit("sockets::get");
-  // socket.on("sockets", setOnlineUsers);
+  const res = await fetch("/api/users");
+  const users = await res.json();
+  setOnlineUsers(users);
 });
 
 socket.on("typing", ({ nickname, isTyping }) => {
@@ -74,7 +76,7 @@ socket.on("typing", ({ nickname, isTyping }) => {
     item.dataset.typingNickname = nickname;
     item.textContent = `${nickname} is typing...`;
     messages.appendChild(item);
-    window.scrollTo(0, document.body.scrollHeight);
+    item.scrollIntoView({ behavior: "smooth" });
   } else {
     let item = document.querySelector(`li[data-typing-nickname="${nickname}"]`);
     item.remove();
