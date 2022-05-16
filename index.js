@@ -18,10 +18,18 @@ const BgCyan = "\x1b[46m";
 
 app.use(express.static(path.join(__dirname, "public")));
 
+// io middlewares
+io.use((socket, next) => {
+  const nickname = socket.handshake.auth.nickname;
+  if (!nickname) {
+    return next(new Error("invalid nickname"));
+  }
+  socket.nickname = nickname;
+  next();
+});
+
 // io events
 io.on("connection", (socket) => {
-  socket.nickname = socket.handshake.auth.nickname;
-
   console.log(
     FgGreen,
     `A user connected, one new socket opened, total: ${io.engine.clientsCount}`
@@ -74,6 +82,12 @@ app.get("/api/users", async (req, res) => {
     };
   });
   res.status(200).json(users);
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send("Something went wrong");
 });
 
 // Start the server

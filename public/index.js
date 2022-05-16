@@ -120,6 +120,7 @@ socket.on("typing", ({ nickname, isTyping }) => {
 globalBtn.addEventListener("click", () => {
   selectedUser = null;
   chatRoomName.textContent = "Global";
+  globalBtn.classList.add("hidden");
 });
 
 onlineUl.addEventListener("click", (e) => {
@@ -132,5 +133,6 @@ onlineUl.addEventListener("click", (e) => {
     input.disabled = false;
     input.focus();
     chatRoomName.textContent = `${selectedUser}`;
+    globalBtn.classList.remove("hidden");
   }
 });
