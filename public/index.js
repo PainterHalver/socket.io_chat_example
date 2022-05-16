@@ -8,34 +8,33 @@ while (!nickname) {
 sessionStorage.setItem("nickname", nickname);
 document.title = `Chat - ${nickname}`;
 
-socket.connect({ auth: { nickname } });
+socket.auth = { nickname };
+socket.connect();
 
 // Debugging
 socket.onAny((event, ...args) => {
   console.log(event, args);
 });
 
+/**
+ * Variables
+ */
 const form = document.getElementById("form");
 const input = document.getElementById("input");
 const online = document.getElementById("online-count");
 const onlineUl = document.getElementById("online-users");
+const chatRoomName = document.querySelector(".room-name");
+const globalBtn = document.querySelector(".btn-global");
 
-const appendMessage = (msg) => {
-  let item = document.createElement("li");
-  item.textContent = msg;
-  messages.appendChild(item);
-  item.scrollIntoView({ behavior: "smooth" });
-};
+/**
+ * States
+ */
+let users = [];
+let selectedUser = null;
 
-const setOnlineUsers = (users) => {
-  onlineUl.innerHTML = "";
-  users.forEach((user) => {
-    let item = document.createElement("li");
-    item.textContent = user.nickname;
-    onlineUl.appendChild(item);
-  });
-};
-
+/**
+ * Events
+ */
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   if (input.value) {
@@ -44,7 +43,10 @@ form.addEventListener("submit", (e) => {
   }
 });
 
-// Typing
+/**
+ * Typing
+ */
+
 // https://stackoverflow.com/questions/16766488/socket-io-how-to-check-if-user-is-typing-and-broadcast-it-to-other-users
 let typing = false;
 let timeout = undefined;
@@ -70,11 +72,32 @@ input.addEventListener("keypress", (e) => {
   }
 });
 
+/**
+ * Socket events
+ */
+const appendMessage = (msg) => {
+  let item = document.createElement("li");
+  item.textContent = msg;
+  messages.appendChild(item);
+  item.scrollIntoView({ behavior: "smooth" });
+};
+
+const setOnlineUsers = (users) => {
+  onlineUl.innerHTML = "";
+  users.forEach((user) => {
+    let item = document.createElement("li");
+    item.textContent = user.nickname;
+    item.dataset.id = user.socketId;
+    item.dataset.nickname = user.nickname;
+    onlineUl.appendChild(item);
+  });
+};
+
 socket.on("chat message", appendMessage);
 socket.on("online count change", async (count) => {
   online.textContent = `Online: ${count}`;
   const res = await fetch("/api/users");
-  const users = await res.json();
+  users = await res.json();
   setOnlineUsers(users);
 });
 
@@ -88,5 +111,26 @@ socket.on("typing", ({ nickname, isTyping }) => {
   } else {
     let item = document.querySelector(`li[data-typing-nickname="${nickname}"]`);
     item.remove();
+  }
+});
+
+/**
+ * Handle user selection
+ */
+globalBtn.addEventListener("click", () => {
+  selectedUser = null;
+  chatRoomName.textContent = "Global";
+});
+
+onlineUl.addEventListener("click", (e) => {
+  if (e.target.tagName === "LI") {
+    if (e.target.dataset.id === socket.id) {
+      return;
+    }
+
+    selectedUser = e.target.dataset.nickname;
+    input.disabled = false;
+    input.focus();
+    chatRoomName.textContent = `${selectedUser}`;
   }
 });
