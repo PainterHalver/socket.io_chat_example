@@ -1,10 +1,19 @@
+// Wait for nickname before connecting
+const socket = io({ autoConnect: false });
+
 let nickname = sessionStorage.getItem("nickname");
 while (!nickname) {
   nickname = prompt("What is your nickname?");
-  sessionStorage.setItem("nickname", nickname);
 }
+sessionStorage.setItem("nickname", nickname);
 document.title = `Chat - ${nickname}`;
-const socket = io({ query: { nickname } });
+
+socket.connect({ auth: { nickname } });
+
+// Debugging
+socket.onAny((event, ...args) => {
+  console.log(event, args);
+});
 
 const form = document.getElementById("form");
 const input = document.getElementById("input");
@@ -31,7 +40,6 @@ form.addEventListener("submit", (e) => {
   e.preventDefault();
   if (input.value) {
     socket.emit("chat message", input.value);
-    appendMessage(`${nickname}: ${input.value}`);
     input.value = "";
   }
 });

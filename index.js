@@ -18,8 +18,9 @@ const BgCyan = "\x1b[46m";
 
 app.use(express.static(path.join(__dirname, "public")));
 
+// io events
 io.on("connection", (socket) => {
-  socket.nickname = socket.handshake.query.nickname;
+  socket.nickname = socket.handshake.auth.nickname;
 
   console.log(
     FgGreen,
@@ -31,7 +32,7 @@ io.on("connection", (socket) => {
   io.emit("online count change", io.engine.clientsCount);
 
   // emit to all clients except the sender
-  socket.broadcast.emit(
+  io.emit(
     "chat message",
     `${socket.nickname} joined the chat, total: ${io.engine.clientsCount}`
   );
@@ -46,7 +47,7 @@ io.on("connection", (socket) => {
     console.log(FgCyan, `Received message: ${msg}`);
 
     // Emit the same event name.
-    socket.broadcast.emit("chat message", `${socket.nickname}: ${msg}`);
+    io.emit("chat message", `${socket.nickname}: ${msg}`);
   });
 
   // When someone disconnects
@@ -63,6 +64,7 @@ io.on("connection", (socket) => {
   });
 });
 
+// Express routes
 app.get("/api/users", async (req, res) => {
   const sockets = await io.fetchSockets();
   const users = sockets.map((socket) => {
@@ -74,6 +76,7 @@ app.get("/api/users", async (req, res) => {
   res.status(200).json(users);
 });
 
+// Start the server
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}...`);
 });
