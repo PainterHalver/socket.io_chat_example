@@ -1,15 +1,34 @@
-// Wait for nickname before connecting
-const socket = io({ autoConnect: false });
+/**
+ * States
+ */
+let users = [];
+let selectedUser = null;
+let nickname = "";
 
-let nickname = sessionStorage.getItem("nickname");
-while (!nickname) {
-  nickname = prompt("What is your nickname?");
-}
-sessionStorage.setItem("nickname", nickname);
-document.title = `Chat - ${nickname}`;
+/**
+ * Init
+ */
+const socket = io({ autoConnect: false }); // Wait for nickname before connecting
 
-socket.auth = { nickname };
-socket.connect();
+const init = async () => {
+  nickname = sessionStorage.getItem("nickname");
+  while (!nickname) {
+    nickname = prompt("What is your nickname?");
+  }
+
+  const res = await fetch("/api/users");
+  const users = await res.json();
+  if (users.find((user) => user.nickname === nickname)) {
+    alert("Nickname already taken.");
+    await init();
+  }
+
+  sessionStorage.setItem("nickname", nickname);
+  document.title = `Chat - ${nickname}`;
+  socket.auth = { nickname };
+  socket.connect();
+};
+init();
 
 // Debugging
 socket.onAny((event, ...args) => {
@@ -25,12 +44,6 @@ const online = document.getElementById("online-count");
 const onlineUl = document.getElementById("online-users");
 const chatRoomName = document.querySelector(".room-name");
 const globalBtn = document.querySelector(".btn-global");
-
-/**
- * States
- */
-let users = [];
-let selectedUser = null;
 
 /**
  * Events

@@ -19,7 +19,7 @@ const BgCyan = "\x1b[46m";
 app.use(express.static(path.join(__dirname, "public")));
 
 // io middlewares
-io.use((socket, next) => {
+io.use(async (socket, next) => {
   const nickname = socket.handshake.auth.nickname;
   if (!nickname) {
     return next(new Error("invalid nickname"));
