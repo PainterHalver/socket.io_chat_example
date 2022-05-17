@@ -17,10 +17,11 @@ const init = async () => {
   }
 
   const res = await fetch("/api/users");
-  const users = await res.json();
+  users = await res.json();
   if (users.find((user) => user.nickname === nickname)) {
+    sessionStorage.clear();
     alert("Nickname already taken.");
-    document.location.reload(true);
+    return document.location.reload(true);
   }
 
   sessionStorage.setItem("nickname", nickname);

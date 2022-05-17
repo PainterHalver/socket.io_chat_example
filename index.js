@@ -24,6 +24,12 @@ io.use(async (socket, next) => {
   if (!nickname) {
     return next(new Error("invalid nickname"));
   }
+
+  const sockets = await io.fetchSockets();
+  if (sockets.find((s) => s.handshake.auth.nickname === nickname)) {
+    return next(new Error("nickname already taken"));
+  }
+
   socket.nickname = nickname;
   next();
 });
@@ -92,7 +98,7 @@ app.get("/api/users", async (req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.log(err);
   res.status(500).send("Something went wrong");
 });
 
