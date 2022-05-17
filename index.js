@@ -36,8 +36,11 @@ io.on("connection", (socket) => {
   );
   console.log(FgCyan, `Socket ID: ${socket.id}, nickname: ${socket.nickname}`);
 
-  // Send the current online count to the all users
-  io.emit("online count change", io.engine.clientsCount);
+  // Send the connected user to all users
+  io.emit("user connected", {
+    nickname: socket.nickname,
+    id: socket.id,
+  });
 
   // emit to all clients except the sender
   io.emit(
@@ -68,7 +71,10 @@ io.on("connection", (socket) => {
       "chat message",
       `${socket.nickname} left the chat, total: ${io.engine.clientsCount}`
     );
-    io.emit("online count change", io.engine.clientsCount);
+    io.emit("user disconnected", {
+      nickname: socket.nickname,
+      id: socket.id,
+    });
   });
 });
 
@@ -78,7 +84,7 @@ app.get("/api/users", async (req, res) => {
   const users = sockets.map((socket) => {
     return {
       nickname: socket.nickname,
-      socketId: socket.id,
+      id: socket.id,
     };
   });
   res.status(200).json(users);

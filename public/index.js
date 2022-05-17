@@ -20,13 +20,15 @@ const init = async () => {
   const users = await res.json();
   if (users.find((user) => user.nickname === nickname)) {
     alert("Nickname already taken.");
-    await init();
+    document.location.reload(true);
   }
 
   sessionStorage.setItem("nickname", nickname);
   document.title = `Chat - ${nickname}`;
   socket.auth = { nickname };
   socket.connect();
+
+  users.forEach((user) => addOnlineUser(user));
 };
 init();
 
@@ -95,24 +97,22 @@ const appendMessage = (msg) => {
   item.scrollIntoView({ behavior: "smooth" });
 };
 
-const setOnlineUsers = (users) => {
-  onlineUl.innerHTML = "";
-  users.forEach((user) => {
-    let item = document.createElement("li");
-    item.textContent = user.nickname;
-    item.dataset.id = user.socketId;
-    item.dataset.nickname = user.nickname;
-    onlineUl.appendChild(item);
-  });
+const addOnlineUser = (user) => {
+  let item = document.createElement("li");
+  item.textContent = user.nickname;
+  item.dataset.id = user.id;
+  item.dataset.nickname = user.nickname;
+  onlineUl.appendChild(item);
+};
+
+const removeOnlineUser = (user) => {
+  const item = onlineUl.querySelector(`[data-id="${user.id}"]`);
+  onlineUl.removeChild(item);
 };
 
 socket.on("chat message", appendMessage);
-socket.on("online count change", async (count) => {
-  online.textContent = `Online: ${count}`;
-  const res = await fetch("/api/users");
-  users = await res.json();
-  setOnlineUsers(users);
-});
+socket.on("user connected", addOnlineUser);
+socket.on("user disconnected", removeOnlineUser);
 
 socket.on("typing", ({ nickname, isTyping }) => {
   if (isTyping) {
@@ -142,10 +142,13 @@ onlineUl.addEventListener("click", (e) => {
       return;
     }
 
-    selectedUser = e.target.dataset.nickname;
+    selectedUser = {
+      nickname: e.target.dataset.nickname,
+      id: e.target.dataset.id,
+    };
     input.disabled = false;
     input.focus();
-    chatRoomName.textContent = `${selectedUser}`;
+    chatRoomName.textContent = `${selectedUser.nickname}`;
     globalBtn.classList.remove("hidden");
   }
 });
