@@ -4,6 +4,10 @@
 let users = [];
 let selectedUser = null;
 let nickname = "";
+const chatMessages = {
+  global: [],
+  to: {},
+};
 
 /**
  * Init
@@ -14,6 +18,7 @@ const init = async () => {
   nickname = sessionStorage.getItem("nickname");
   while (!nickname) {
     nickname = prompt("What is your nickname?");
+    nickname = nickname.trim();
   }
 
   const res = await fetch("/api/users");
@@ -44,6 +49,7 @@ socket.onAny((event, ...args) => {
 const form = document.getElementById("form");
 const input = document.getElementById("input");
 const online = document.getElementById("online-count");
+const messages = document.getElementById("messages");
 const onlineUl = document.getElementById("online-users");
 const chatRoomName = document.querySelector(".room-name");
 const globalBtn = document.querySelector(".btn-global");
@@ -54,7 +60,7 @@ const globalBtn = document.querySelector(".btn-global");
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   if (input.value) {
-    socket.emit("chat message", input.value);
+    socket.emit("global message", input.value);
     input.value = "";
   }
 });
@@ -98,6 +104,11 @@ const appendMessage = (msg) => {
   item.scrollIntoView({ behavior: "smooth" });
 };
 
+const setMessages = (msgs) => {
+  messages.innerHTML = "";
+  msgs.forEach((msg) => appendMessage(msg));
+};
+
 const addOnlineUser = (user) => {
   let item = document.createElement("li");
   item.textContent = user.nickname;
@@ -111,7 +122,12 @@ const removeOnlineUser = (user) => {
   onlineUl.removeChild(item);
 };
 
-socket.on("chat message", appendMessage);
+socket.on("global message", (msg) => {
+  chatMessages.global.push(msg);
+  if (!selectedUser) {
+    appendMessage(msg);
+  }
+});
 socket.on("user connected", addOnlineUser);
 socket.on("user disconnected", removeOnlineUser);
 
@@ -135,6 +151,8 @@ globalBtn.addEventListener("click", () => {
   selectedUser = null;
   chatRoomName.textContent = "Global";
   globalBtn.classList.add("hidden");
+
+  setMessages(chatMessages.global);
 });
 
 onlineUl.addEventListener("click", (e) => {
@@ -151,5 +169,7 @@ onlineUl.addEventListener("click", (e) => {
     input.focus();
     chatRoomName.textContent = `${selectedUser.nickname}`;
     globalBtn.classList.remove("hidden");
+
+    setMessages(chatMessages.to[selectedUser.id] || []);
   }
 });

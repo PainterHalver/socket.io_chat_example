@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
 
   // emit to all clients except the sender
   io.emit(
-    "chat message",
+    "global message",
     `${socket.nickname} joined the chat, total: ${io.engine.clientsCount}`
   );
 
@@ -60,11 +60,11 @@ io.on("connection", (socket) => {
   });
 
   // When someone sends a message
-  socket.on("chat message", (msg) => {
+  socket.on("global message", (msg) => {
     console.log(FgCyan, `Received message: ${msg}`);
 
     // Emit the same event name.
-    io.emit("chat message", `${socket.nickname}: ${msg}`);
+    io.emit("global message", `${socket.nickname}: ${msg}`);
   });
 
   // When someone disconnects
@@ -74,7 +74,7 @@ io.on("connection", (socket) => {
       `${socket.nickname} disconnected, total: ${io.engine.clientsCount}, reason: ${reason}`
     );
     io.emit(
-      "chat message",
+      "global message",
       `${socket.nickname} left the chat, total: ${io.engine.clientsCount}`
     );
     io.emit("user disconnected", {
