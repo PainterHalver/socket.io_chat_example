@@ -132,6 +132,12 @@ socket.on("user connected", addOnlineUser);
 socket.on("user disconnected", removeOnlineUser);
 
 socket.on("typing", ({ nickname, isTyping }) => {
+  // Not the current selected user typing
+  if (selectedUser && selectedUser.nickname !== nickname) {
+    return;
+  }
+  // TODO: current user is typing but in global chat
+
   if (isTyping) {
     let item = document.createElement("li");
     item.dataset.typingNickname = nickname;
