@@ -46,6 +46,7 @@ io.on("connection", (socket) => {
   io.emit("user connected", {
     nickname: socket.nickname,
     id: socket.id,
+    messages: [],
   });
 
   // emit to all clients except the sender
@@ -65,6 +66,16 @@ io.on("connection", (socket) => {
 
     // Emit the same event name.
     io.emit("global message", `${socket.nickname}: ${msg}`);
+  });
+
+  // When someone sends a private message
+  socket.on("private message", ({ to, message }) => {
+    // Socket instance automatically joins the room identified by the its id
+    // so we send the message to room with the id of the recipient
+    socket.to(to).emit("private message", {
+      from: socket.id,
+      message,
+    });
   });
 
   // When someone disconnects
@@ -91,6 +102,7 @@ app.get("/api/users", async (req, res) => {
     return {
       nickname: socket.nickname,
       id: socket.id,
+      messages: [],
     };
   });
   res.status(200).json(users);

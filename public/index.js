@@ -6,7 +6,6 @@ let selectedUser = null;
 let nickname = "";
 const chatMessages = {
   global: [],
-  to: {},
 };
 
 /**
@@ -59,10 +58,24 @@ const globalBtn = document.querySelector(".btn-global");
  */
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-  if (input.value) {
-    socket.emit("global message", input.value);
-    input.value = "";
+  if (!input.value) {
+    return;
   }
+
+  if (!selectedUser) {
+    socket.emit("global message", input.value);
+  } else {
+    const message = `${socket.auth.nickname}: ${input.value}`;
+    socket.emit("private message", {
+      to: selectedUser.id,
+      message,
+    });
+    const user = users.findIndex((user) => user.id === selectedUser.id);
+    users[user].messages.push(message);
+    appendMessage(message); // Directly append msg (different from global message, for now)
+  }
+
+  input.value = "";
 });
 
 /**
@@ -128,8 +141,24 @@ socket.on("global message", (msg) => {
     appendMessage(msg);
   }
 });
-socket.on("user connected", addOnlineUser);
-socket.on("user disconnected", removeOnlineUser);
+
+socket.on("private message", ({ from, message }) => {
+  const fromUserIndex = users.findIndex((user) => user.id === from);
+  users[fromUserIndex].messages.push(message);
+
+  if (selectedUser && from === selectedUser.id) {
+    appendMessage(message);
+  }
+});
+
+socket.on("user connected", (user) => {
+  addOnlineUser(user);
+  users.push(user);
+});
+socket.on("user disconnected", (user) => {
+  removeOnlineUser(user);
+  users = users.filter((u) => u.id !== user.id);
+});
 
 socket.on("typing", ({ nickname, isTyping }) => {
   // Not the current selected user typing
@@ -176,6 +205,8 @@ onlineUl.addEventListener("click", (e) => {
     chatRoomName.textContent = `${selectedUser.nickname}`;
     globalBtn.classList.remove("hidden");
 
-    setMessages(chatMessages.to[selectedUser.id] || []);
+    setMessages(
+      users[users.findIndex((user) => user.id === selectedUser.id)].messages
+    );
   }
 });
