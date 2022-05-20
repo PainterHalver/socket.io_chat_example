@@ -15,3 +15,4 @@ Here are some ideas to improve the application:
 - [x] Text wrap when msg too long, or limit chars length (`word-break: break-word;`)
 - [x] Add private messaging.
 - [x] Fix typing... is mixed between global and private
+- [ ] Add new private message notifications and put on top of online users list
