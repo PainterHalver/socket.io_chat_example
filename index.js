@@ -36,10 +36,7 @@ io.use(async (socket, next) => {
 
 // io events
 io.on("connection", (socket) => {
-  console.log(
-    FgGreen,
-    `A user connected, one new socket opened, total: ${io.engine.clientsCount}`
-  );
+  console.log(FgGreen, `A user connected, one new socket opened, total: ${io.engine.clientsCount}`);
   console.log(FgCyan, `Socket ID: ${socket.id}, nickname: ${socket.nickname}`);
 
   // Send the connected user to all users
@@ -50,14 +47,15 @@ io.on("connection", (socket) => {
   });
 
   // emit to all clients except the sender
-  io.emit(
-    "global message",
-    `${socket.nickname} joined the chat, total: ${io.engine.clientsCount}`
-  );
+  io.emit("global message", `${socket.nickname} joined the chat, total: ${io.engine.clientsCount}`);
 
   // When someone is typing
-  socket.on("typing", (isTyping) => {
-    socket.broadcast.emit("typing", { nickname: socket.nickname, isTyping });
+  socket.on("typing", ({ isTyping, to }) => {
+    socket.broadcast.emit("typing", {
+      nickname: socket.nickname,
+      isTyping,
+      to,
+    });
   });
 
   // When someone sends a message
@@ -80,14 +78,8 @@ io.on("connection", (socket) => {
 
   // When someone disconnects
   socket.on("disconnect", (reason) => {
-    console.log(
-      FgRed,
-      `${socket.nickname} disconnected, total: ${io.engine.clientsCount}, reason: ${reason}`
-    );
-    io.emit(
-      "global message",
-      `${socket.nickname} left the chat, total: ${io.engine.clientsCount}`
-    );
+    console.log(FgRed, `${socket.nickname} disconnected, total: ${io.engine.clientsCount}, reason: ${reason}`);
+    io.emit("global message", `${socket.nickname} left the chat, total: ${io.engine.clientsCount}`);
     io.emit("user disconnected", {
       nickname: socket.nickname,
       id: socket.id,

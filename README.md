@@ -13,4 +13,5 @@ Here are some ideas to improve the application:
 - [x] Add “{user} is typing” functionality.
 - [x] Show who’s online.
 - [x] Text wrap when msg too long, or limit chars length (`word-break: break-word;`)
-- [ ] Add private messaging.
+- [x] Add private messaging.
+- [x] Fix typing... is mixed between global and private

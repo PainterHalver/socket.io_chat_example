@@ -88,14 +88,14 @@ let timeout = undefined;
 
 const timeoutFunction = () => {
   typing = false;
-  socket.emit("typing", false);
+  socket.emit("typing", { isTyping: false, to: null });
 };
 
 input.addEventListener("keypress", (e) => {
   if (e.key !== "Enter") {
     if (!typing) {
       typing = true;
-      socket.emit("typing", true);
+      socket.emit("typing", { isTyping: true, to: selectedUser ? selectedUser.id : null });
       timeout = setTimeout(timeoutFunction, 1000);
     } else {
       clearTimeout(timeout);
@@ -160,23 +160,33 @@ socket.on("user disconnected", (user) => {
   users = users.filter((u) => u.id !== user.id);
 });
 
-socket.on("typing", ({ nickname, isTyping }) => {
-  // Not the current selected user typing
+socket.on("typing", ({ nickname, isTyping, to }) => {
+  if (!isTyping) {
+    let items = document.querySelectorAll(`li[data-typing-nickname="${nickname}"]`);
+    items.forEach((item) => item.remove());
+    return;
+  }
+
+  // In private chat, not selected user typing
   if (selectedUser && selectedUser.nickname !== nickname) {
     return;
   }
-  // TODO: current user is typing but in global chat
 
-  if (isTyping) {
-    let item = document.createElement("li");
-    item.dataset.typingNickname = nickname;
-    item.textContent = `${nickname} is typing...`;
-    messages.appendChild(item);
-    item.scrollIntoView({ behavior: "smooth" });
-  } else {
-    let item = document.querySelector(`li[data-typing-nickname="${nickname}"]`);
-    item.remove();
+  // In private chat, but selected user typing in global chat or to someone else
+  if (selectedUser && (!to || to !== socket.id)) {
+    return;
   }
+
+  // In global chat, but user is typing in private chat
+  if (!selectedUser && to) {
+    return;
+  }
+
+  let item = document.createElement("li");
+  item.dataset.typingNickname = nickname;
+  item.textContent = `${nickname} is typing...`;
+  messages.appendChild(item);
+  item.scrollIntoView({ behavior: "smooth" });
 });
 
 /**
@@ -205,8 +215,6 @@ onlineUl.addEventListener("click", (e) => {
     chatRoomName.textContent = `${selectedUser.nickname}`;
     globalBtn.classList.remove("hidden");
 
-    setMessages(
-      users[users.findIndex((user) => user.id === selectedUser.id)].messages
-    );
+    setMessages(users[users.findIndex((user) => user.id === selectedUser.id)].messages);
   }
 });
