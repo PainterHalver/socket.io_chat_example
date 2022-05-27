@@ -5,8 +5,7 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .hidden {
@@ -141,4 +140,8 @@ body {
 
 #online-users > li:hover {
   background: #efefef54;
+}
+
+.li__selected {
+  background-color: orange !important;
 }

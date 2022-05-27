@@ -4,6 +4,7 @@
 let users = [];
 let selectedUser = null;
 let nickname = "";
+let selectedListItem = null;
 const chatMessages = {
   global: [],
 };
@@ -194,6 +195,8 @@ socket.on("typing", ({ nickname, isTyping, to }) => {
  */
 globalBtn.addEventListener("click", () => {
   selectedUser = null;
+  selectedListItem.classList.remove("li__selected")
+  selectedListItem = null;
   chatRoomName.textContent = "Global";
   globalBtn.classList.add("hidden");
 
@@ -205,6 +208,12 @@ onlineUl.addEventListener("click", (e) => {
     if (e.target.dataset.id === socket.id) {
       return;
     }
+
+    if (selectedListItem) {
+      selectedListItem.classList.remove("li__selected")
+    }
+    selectedListItem = e.target;
+    selectedListItem.classList.add("li__selected");
 
     selectedUser = {
       nickname: e.target.dataset.nickname,
