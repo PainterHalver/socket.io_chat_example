@@ -9,6 +9,7 @@ const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
 
+const Reset = "\x1b[0m";
 const FgRed = "\x1b[31m";
 const FgGreen = "\x1b[32m";
 const FgCyan = "\x1b[36m";
@@ -36,8 +37,8 @@ io.use(async (socket, next) => {
 
 // io events
 io.on("connection", (socket) => {
-  console.log(FgGreen, `A user connected, one new socket opened, total: ${io.engine.clientsCount}`);
-  console.log(FgCyan, `Socket ID: ${socket.id}, nickname: ${socket.nickname}`);
+  console.log(FgGreen, `A user connected, one new socket opened, total: ${io.engine.clientsCount}`, Reset);
+  console.log(FgCyan, `Socket ID: ${socket.id}, nickname: ${socket.nickname}`, Reset);
 
   // Send the connected user to all users
   io.emit("user connected", {
@@ -60,7 +61,7 @@ io.on("connection", (socket) => {
 
   // When someone sends a message
   socket.on("global message", (msg) => {
-    console.log(FgCyan, `Received message: ${msg}`);
+    console.log(FgCyan, `Received message: ${msg}`, Reset);
 
     // Emit the same event name.
     io.emit("global message", `${socket.nickname}: ${msg}`);
@@ -78,7 +79,7 @@ io.on("connection", (socket) => {
 
   // When someone disconnects
   socket.on("disconnect", (reason) => {
-    console.log(FgRed, `${socket.nickname} disconnected, total: ${io.engine.clientsCount}, reason: ${reason}`);
+    console.log(FgRed, `${socket.nickname} disconnected, total: ${io.engine.clientsCount}, reason: ${reason}`, Reset);
     io.emit("global message", `${socket.nickname} left the chat, total: ${io.engine.clientsCount}`);
     io.emit("user disconnected", {
       nickname: socket.nickname,
