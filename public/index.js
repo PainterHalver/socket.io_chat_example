@@ -147,6 +147,16 @@ socket.on("private message", ({ from, message }) => {
   const fromUserIndex = users.findIndex((user) => user.id === from);
   users[fromUserIndex].messages.push(message);
 
+  // If from user is not selected, add a class to the list item
+  if (!selectedUser || (from !== selectedUser.id)) {
+    const item = onlineUl.querySelector(`[data-id="${from}"]`);
+    item.classList.add("has-new-private-message");
+
+    // move it to the top of the list
+    const parent = item.parentNode;
+    parent.insertBefore(item, parent.firstChild); // no need to remove the old one
+  }
+
   if (selectedUser && from === selectedUser.id) {
     appendMessage(message);
   }
@@ -225,5 +235,8 @@ onlineUl.addEventListener("click", (e) => {
     globalBtn.classList.remove("hidden");
 
     setMessages(users[users.findIndex((user) => user.id === selectedUser.id)].messages);
+
+    // Remove the has-new-private-message class from the list item
+    selectedListItem.classList.remove("has-new-private-message");
   }
 });

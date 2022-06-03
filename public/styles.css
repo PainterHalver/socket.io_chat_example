@@ -135,13 +135,18 @@ body {
 
 #online-users > li {
   padding: 0.5rem 1rem;
-  background: #efefef;
+  background-color: #efefef;
 }
 
 #online-users > li:hover {
-  background: #efefef54;
+  cursor: pointer;
+  background-color: #efefef54;
 }
 
 .li__selected {
   background-color: orange !important;
+}
+
+.has-new-private-message {
+  background-color: red !important;
 }
