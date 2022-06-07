@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
   });
 
   // emit to all clients except the sender
-  io.emit("global message", `${socket.nickname} joined the chat, total: ${io.engine.clientsCount}`);
+  io.emit("global message", `/text-green-500 ${socket.nickname} joined the chat, total: ${io.engine.clientsCount}`);
 
   // When someone is typing
   socket.on("typing", ({ isTyping, to }) => {
@@ -80,7 +80,7 @@ io.on("connection", (socket) => {
   // When someone disconnects
   socket.on("disconnect", (reason) => {
     console.log(FgRed, `${socket.nickname} disconnected, total: ${io.engine.clientsCount}, reason: ${reason}`, Reset);
-    io.emit("global message", `${socket.nickname} left the chat, total: ${io.engine.clientsCount}`);
+    io.emit("global message", `/text-red-500 ${socket.nickname} left the chat, total: ${io.engine.clientsCount}`);
     io.emit("user disconnected", {
       nickname: socket.nickname,
       id: socket.id,

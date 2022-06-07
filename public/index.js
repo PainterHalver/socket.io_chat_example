@@ -113,7 +113,15 @@ input.addEventListener("keypress", (e) => {
  */
 const appendMessage = (msg) => {
   let item = document.createElement("li");
-  item.textContent = msg;
+
+  // If the message has the type of "/util-class msg", then add the class to the message
+  const matches = msg.match(/(?<=\/)[\w|\-]+(?=\s)/g);
+  if (matches) {
+    const classToBeAdded = matches[0];
+    item.classList.add(classToBeAdded);
+  }
+
+  item.textContent = msg.replace(/\/[\w|\-]+\s/g, "");
   messages.appendChild(item);
   item.scrollIntoView({ behavior: "smooth" });
 };
