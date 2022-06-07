@@ -1,7 +1,5 @@
 https://socket.io/get-started/chat
 
-https://socket.io/docs/v4/emit-cheatsheet/
-
 # Homework
 
 Here are some ideas to improve the application:
@@ -12,7 +10,6 @@ Here are some ideas to improve the application:
 - [x] Don’t send the same message to the user that sent it. Instead, append the message directly as soon as he/she presses enter. (Doesn't make much sense)
 - [x] Add “{user} is typing” functionality.
 - [x] Show who’s online.
-- [x] Text wrap when msg too long, or limit chars length (`word-break: break-word;`)
-- [x] Add private messaging.
-- [x] Fix typing... is mixed between global and private
+- [x] Private messaging.
 - [x] Add new private message notifications and put on top of online users list
+- [ ] Using commands like `/text-green-500` to colorize message, suggestions when typing command
