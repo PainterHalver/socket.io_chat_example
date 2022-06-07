@@ -126,6 +126,12 @@ const setMessages = (msgs) => {
 const addOnlineUser = (user) => {
   let item = document.createElement("li");
   item.textContent = user.nickname;
+
+  if (user.nickname === nickname) {
+    item.textContent += " (you)";
+    item.classList.add("text-green-500")
+  }
+
   item.dataset.id = user.id;
   item.dataset.nickname = user.nickname;
   onlineUl.appendChild(item);
