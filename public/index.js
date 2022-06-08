@@ -118,7 +118,13 @@ const appendMessage = (msg) => {
   const matches = msg.match(/(?<=\/)[\w|\-]+(?=\s)/g);
   if (matches) {
     const classToBeAdded = matches[0];
-    item.classList.add(classToBeAdded);
+
+    // Only allow certain class prefixes
+    const allowedPrefix = ["text", "bg"];
+    if (allowedPrefix.findIndex((prefix) => classToBeAdded.startsWith(prefix)) !== -1) {
+      item.classList.add(classToBeAdded);
+    }
+
   }
 
   item.textContent = msg.replace(/\/[\w|\-]+\s/g, "");
