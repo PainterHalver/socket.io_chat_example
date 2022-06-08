@@ -53,6 +53,7 @@ const messages = document.getElementById("messages");
 const onlineUl = document.getElementById("online-users");
 const chatRoomName = document.querySelector(".room-name");
 const globalBtn = document.querySelector(".btn-global");
+const suggestions = document.querySelector(".suggestions");
 
 /**
  * Events
@@ -108,6 +109,46 @@ input.addEventListener("keypress", (e) => {
   }
 });
 
+
+// Load available util classes
+const availableUtilClasses = Array.from(document.styleSheets[0].cssRules[0].styleSheet.cssRules).map((rule) => '/' + rule.selectorText.slice(1));
+
+// Input command suggestions
+input.addEventListener('input', (e) => {
+  console.log(e.target.value)
+  const currentInputValue = e.target.value;
+
+  // If the input is empty, then clear the suggestions
+  if (currentInputValue === '') {
+    suggestions.innerHTML = '';
+    return;
+  }
+
+  // If user is not typing command, then clear the suggestions
+  // TODO: Better way to check if user is typing command
+  if (currentInputValue.split(' ').length > 1) {
+    suggestions.innerHTML = '';
+    return;
+  }
+
+  // If the input is not empty, then show the suggestions
+  const foundSuggestions = availableUtilClasses.filter((utilClass) => utilClass.startsWith(currentInputValue.match(/^\/[\w|-]*/g)[0]));
+  suggestions.innerHTML = '';
+  foundSuggestions.forEach((suggestion) => {
+    const div = document.createElement('div');
+    div.classList.add(suggestion.slice(1));
+    div.innerHTML = suggestion;
+    suggestions.appendChild(div);
+
+    div.addEventListener('click', (e) => {
+      input.value = suggestion + ' ';
+      suggestions.innerHTML = '';
+      input.focus()
+    })
+  })
+})
+
+
 /**
  * Socket events
  */
@@ -124,7 +165,6 @@ const appendMessage = (msg) => {
     if (allowedPrefix.findIndex((prefix) => classToBeAdded.startsWith(prefix)) !== -1) {
       item.classList.add(classToBeAdded);
     }
-
   }
 
   item.textContent = msg.replace(/\/[\w|\-]+\s/g, "");
