@@ -122,6 +122,10 @@ body {
 .suggestions div {
   padding: 10px;
   cursor: pointer;
+  background-color: #efefef;
+}
+.suggestions div:hover {
+  background-color: #efefef9c;
 }
 .suggestions::-webkit-scrollbar {
   display: none;

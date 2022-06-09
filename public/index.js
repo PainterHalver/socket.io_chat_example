@@ -136,8 +136,10 @@ input.addEventListener('input', (e) => {
   suggestions.innerHTML = '';
   foundSuggestions.forEach((suggestion) => {
     const div = document.createElement('div');
-    div.classList.add(suggestion.slice(1));
-    div.innerHTML = suggestion;
+
+    const markup = `${suggestion}: e.g. <span class="${suggestion.slice(1)}">Message</span>`;
+    div.innerHTML = markup;
+
     suggestions.appendChild(div);
 
     div.addEventListener('click', (e) => {
