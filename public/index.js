@@ -137,7 +137,7 @@ input.addEventListener('input', (e) => {
   foundSuggestions.forEach((suggestion) => {
     const div = document.createElement('div');
 
-    const markup = `${suggestion}: e.g. <span class="${suggestion.slice(1)}">Message</span>`;
+    const markup = `${suggestion}: <span class="${suggestion.slice(1)}">Message</span>`;
     div.innerHTML = markup;
 
     suggestions.appendChild(div);
