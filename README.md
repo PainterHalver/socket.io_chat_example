@@ -1,6 +1,6 @@
-https://socket.io/get-started/chat
-
 # Homework
+
+<https://socket.io/get-started/chat>
 
 Here are some ideas to improve the application:
 
@@ -12,4 +12,4 @@ Here are some ideas to improve the application:
 - [x] Show who’s online.
 - [x] Private messaging.
 - [x] Add new private message notifications and put on top of online users list
-- [ ] Using commands like `/text-green-500` to colorize message, suggestions when typing command
+- [x] Using commands like `/text-green-500` to colorize message, suggestions when typing command

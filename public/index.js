@@ -125,7 +125,6 @@ input.addEventListener('input', (e) => {
   }
 
   // If user is not typing command, then clear the suggestions
-  // TODO: Better way to check if user is typing command
   if (currentInputValue.split(' ').length > 1) {
     suggestions.innerHTML = '';
     return;
@@ -231,6 +230,12 @@ socket.on("user connected", (user) => {
 socket.on("user disconnected", (user) => {
   removeOnlineUser(user);
   users = users.filter((u) => u.id !== user.id);
+
+  // Other user disconnects when in private chat, then show disconnected message and disable the input
+  if (selectedUser && selectedUser.id === user.id) {
+    appendMessage(`/text-red-500 ${user.nickname} disconnected!`);
+    input.disabled = true;
+  }
 });
 
 socket.on("typing", ({ nickname, isTyping, to }) => {
@@ -266,6 +271,7 @@ socket.on("typing", ({ nickname, isTyping, to }) => {
  * Handle user selection
  */
 globalBtn.addEventListener("click", () => {
+  input.disabled = false;
   selectedUser = null;
   selectedListItem.classList.remove("li__selected")
   selectedListItem = null;
